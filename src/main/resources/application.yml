@@ -1,0 +1,16 @@
+spring:
+  jmx:
+    enabled: false
+
+javafx:
+  title: CodeMine
+  stage:
+    resizable: true
+
+minecraft:
+  news: https://codemine.eientei.org/news.html
+  users: https://codemine.eientei.org/api/users
+  manifest: https://codemine.eientei.org/manifest.json
+  versions: https://launchermeta.mojang.com/mc/game/version_manifest.json
+  resources: https://resources.download.minecraft.net
+  central: https://libraries.minecraft.net

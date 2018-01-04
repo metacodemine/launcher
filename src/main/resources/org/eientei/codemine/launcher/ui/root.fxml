@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.eientei.codemine.launcher.ui.RootController">
+    <children>
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <fx:include source="login.fxml" fx:id="loginPane"/>
+                <fx:include source="signup.fxml" fx:id="signupPane"/>
+                <fx:include source="main.fxml" fx:id="mainPane"/>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>

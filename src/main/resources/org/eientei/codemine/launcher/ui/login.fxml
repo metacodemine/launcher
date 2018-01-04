@@ -1,0 +1,39 @@
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.ColumnConstraints?>
+
+<GridPane alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.eientei.codemine.launcher.ui.LoginController">
+    <columnConstraints>
+        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20" prefWidth="100.0"/>
+        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="5" prefWidth="100.0" />
+        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="60" prefWidth="100.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+    </rowConstraints>
+    <children>
+        <Label text="%username" />
+        <Label text="%password" GridPane.rowIndex="1" />
+        <TextField GridPane.columnIndex="2" fx:id="loginUsername" onKeyReleased="#enterPressed" />
+        <PasswordField GridPane.columnIndex="2" GridPane.rowIndex="1" fx:id="loginPassword" onKeyReleased="#enterPressed" />
+        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <children>
+                <Hyperlink text="%register" onAction="#clickSignup" focusTraversable="false">
+                    <HBox.margin>
+                        <Insets right="20.0" />
+                    </HBox.margin>
+                </Hyperlink>
+                <Button mnemonicParsing="false" prefWidth="100" text="%login" onAction="#loginAction" />
+            </children>
+        </HBox>
+    </children>
+</GridPane>
