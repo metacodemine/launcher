@@ -2,6 +2,7 @@ package org.eientei.codemine.launcher.service;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import org.eientei.codemine.launcher.Wrapper;
 import org.eientei.codemine.launcher.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +15,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class LaunchService {
@@ -31,6 +32,12 @@ public class LaunchService {
 
     @Value("${minecraft.central}")
     private String centralUrl;
+
+    @Value("${minecraft.users}")
+    private String usersUrl;
+
+    @Value("${minecraft.domain}")
+    private String domain;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -58,7 +65,7 @@ public class LaunchService {
         }
     }
 
-    private void execute(VersionManifest versionManifest) throws IOException {
+    private void execute(VersionManifest versionManifest) throws IOException, URISyntaxException {
         Map<String, String> props = new HashMap<>();
         props.put("auth_player_name", configService.getUserName());
         props.put("version_name", versionManifest.getId());
@@ -77,6 +84,7 @@ public class LaunchService {
         });
 
         libs.append(configService.getDataDir()).append(File.separator).append("client.jar");
+        libs.append(File.pathSeparator).append(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsolutePath());
         List<String> args = new ArrayList<>();
         args.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         args.add("-d64");
@@ -86,7 +94,10 @@ public class LaunchService {
         args.add("-DauthToken=" + configService.getToken());
         args.add("-cp");
         args.add(libs.toString());
+        args.add(Wrapper.class.getName());
         args.add(versionManifest.getMainClass());
+        args.add(usersUrl + "/session?value=");
+        args.add(domain);
 
         String[] split = versionManifest.getMinecraftArguments().split("\\s+");
         for (String s : split) {
@@ -96,16 +107,24 @@ public class LaunchService {
                 args.add(s);
             }
         }
-        StringJoiner joiner = new StringJoiner(" ");
-        args.forEach(joiner::add);
-        System.out.println(joiner.toString());
+        //StringJoiner joiner = new StringJoiner(" ");
+        //args.forEach(joiner::add);
+        //System.out.println(joiner.toString());
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+        StringBuilder sb = new StringBuilder();
+        args.forEach(s -> sb.append('"').append(s).append('"').append(" "));
+        System.out.println(sb.toString());
+        //Runtime.getRuntime().exec(sb.toString());
+
         ProcessBuilder processBuilder = new ProcessBuilder(args);
         processBuilder.start();
+
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -143,17 +162,8 @@ public class LaunchService {
         progressor.updateProgress(0.0);
         progressor.updateText("Downloading manifest");
         CodemineManifest codemineManifest = restTemplate.getForObject(manifestUrl, CodemineManifest.class);
-        progressor.updateText("Downloading versions");
-        VersionsDesc versionsDesc = restTemplate.getForObject(versionsUrl, VersionsDesc.class);
-        List<VersionDesc> filtered = versionsDesc.getVersions().stream().filter(m -> codemineManifest.getUpstream().equals(m.getId())).collect(Collectors.toList());
-        if (filtered.isEmpty()) {
-            progressor.error("cannot select version");
-            return null;
-        }
-        VersionDesc versionDesc = filtered.get(0);
-
         progressor.updateText("Downloading version manifest");
-        VersionManifest versionManifest = restTemplate.getForObject(versionDesc.getUrl(), VersionManifest.class);
+        VersionManifest versionManifest = restTemplate.getForObject(codemineManifest.getUpstream(), VersionManifest.class);
         ArtifactDesc clientArtifact = versionManifest.getDownloads().get("client");
         if (clientArtifact == null) {
             progressor.error("cannot get client artifact");

@@ -14,3 +14,4 @@ minecraft:
   versions: https://launchermeta.mojang.com/mc/game/version_manifest.json
   resources: https://resources.download.minecraft.net
   central: https://libraries.minecraft.net
+  domain: codemine.eientei.org

@@ -6,8 +6,11 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -32,11 +35,11 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
             </rowConstraints>
             <children>
-                <Label text="Namaste!" fx:id="welcome">
+                <Label fx:id="welcome" text="Namaste!">
                <GridPane.margin>
                   <Insets left="20.0" />
                </GridPane.margin></Label>
-                <Button mnemonicParsing="false" prefWidth="100" text="%logout" GridPane.columnIndex="1" onAction="#logout" />
+                <Button mnemonicParsing="false" onAction="#logout" prefWidth="100" text="%logout" GridPane.columnIndex="1" />
             </children>
         </GridPane>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.rowIndex="1">
@@ -48,15 +51,39 @@
                 </Tab>
                 <Tab text="%settings">
                     <content>
-                        <GridPane>
+                        <GridPane alignment="CENTER">
                             <columnConstraints>
-                                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" percentWidth="100" prefWidth="100.0" />
+                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20" prefWidth="100.0" />
+                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="5" prefWidth="100.0" />
+                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="60" prefWidth="100.0" />
                             </columnConstraints>
                             <rowConstraints>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                <RowConstraints minHeight="10.0" prefHeight="120.0" valignment="CENTER" vgrow="NEVER" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                             </rowConstraints>
                             <children>
-                                <Label alignment="CENTER" text="%nothing" />
+                                <Label text="%memory" />
+                                <Label text="%skin" GridPane.rowIndex="1" />
+                                <TextField fx:id="memoryField" GridPane.columnIndex="2" />
+                                <HBox alignment="CENTER_LEFT" prefHeight="Infinity" prefWidth="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                    <Button mnemonicParsing="false" onAction="#deleteSkin" text="%deleteskin">
+                                        <HBox.margin>
+                                            <Insets left="5.0" right="5.0" />
+                                        </HBox.margin>
+                                    </Button>
+                                    <Button mnemonicParsing="false" onAction="#loadSkin" text="%loadskin">
+                                        <HBox.margin>
+                                            <Insets left="5.0" right="5.0" />
+                                        </HBox.margin>
+                                    </Button>
+                                    <ImageView fx:id="skinPreview" fitHeight="100" preserveRatio="true">
+                                        <HBox.margin>
+                                            <Insets left="5.0" right="5.0" />
+                                        </HBox.margin>
+                                    </ImageView>
+                                </HBox>
+                                <Button mnemonicParsing="false" onAction="#saveSettings" prefWidth="100" text="%save" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                             </children>
                         </GridPane>
                     </content>
@@ -68,7 +95,7 @@
                 <Button fx:id="launchButton" mnemonicParsing="false" onAction="#launch" prefHeight="Infinity" prefWidth="Infinity" text="%launch" />
                 <VBox fx:id="progressBox" visible="false">
                     <ProgressBar fx:id="progressBar" prefWidth="Infinity" progress="0.0" />
-                    <Label fx:id="progressText"/>
+                    <Label fx:id="progressText" />
                     <padding>
                         <Insets left="20.0" right="20.0" />
                     </padding>
