@@ -53,6 +53,12 @@ public class ConfigService {
         if (configFile.exists()) {
             try {
                 config = objectMapper.readValue(configFile, Config.class);
+                File basedir = new File(config.getDataDir());
+                if (!basedir.exists()) {
+                    if (!basedir.mkdirs()) {
+                        throw new IOException("Not able to ensure dir " + basedir.getAbsolutePath());
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

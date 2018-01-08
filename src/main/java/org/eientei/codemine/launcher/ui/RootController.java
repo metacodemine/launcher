@@ -25,6 +25,9 @@ public class RootController {
     @FXML
     private GridPane mainPane;
 
+    @FXML
+    private GridPane logPane;
+
     @Autowired
     private ConfigService configService;
 
@@ -55,19 +58,29 @@ public class RootController {
         loginPane.setVisible(false);
         signupPane.setVisible(true);
         mainPane.setVisible(false);
+        logPane.setVisible(false);
     }
 
     public void showLogin() {
         loginPane.setVisible(true);
         signupPane.setVisible(false);
         mainPane.setVisible(false);
+        logPane.setVisible(false);
     }
 
     public void showMain() {
         loginPane.setVisible(false);
         signupPane.setVisible(false);
         mainPane.setVisible(true);
+        logPane.setVisible(false);
 
         mainController.greet(configService.getUserName());
+    }
+
+    public void showLog() {
+        loginPane.setVisible(false);
+        signupPane.setVisible(false);
+        mainPane.setVisible(false);
+        logPane.setVisible(true);
     }
 }

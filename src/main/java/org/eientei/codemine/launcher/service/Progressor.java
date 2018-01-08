@@ -4,4 +4,6 @@ public interface Progressor {
     void updateText(String text);
     void updateProgress(double value);
     void error(String text);
+    void switchToLog();
+    void appendLog(String log);
 }

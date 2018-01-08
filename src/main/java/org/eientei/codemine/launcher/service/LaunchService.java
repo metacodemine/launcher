@@ -13,10 +13,13 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
@@ -49,7 +52,6 @@ public class LaunchService {
 
     RestTemplate fetcher = new RestTemplate(Collections.singletonList(new ByteArrayHttpMessageConverter()));
 
-
     public void launch(Progressor progressor) {
         try {
             VersionManifest versionManifest = downloadAll(progressor);
@@ -58,14 +60,14 @@ public class LaunchService {
             if (versionManifest == null) {
                 throw new Exception("null version manifest");
             }
-            execute(versionManifest);
+            execute(versionManifest, progressor);
         } catch (Exception e) {
             e.printStackTrace();
             progressor.error(e.getMessage());
         }
     }
 
-    private void execute(VersionManifest versionManifest) throws IOException, URISyntaxException {
+    private void execute(VersionManifest versionManifest, Progressor progressor) throws IOException, URISyntaxException {
         Map<String, String> props = new HashMap<>();
         props.put("auth_player_name", configService.getUserName());
         props.put("version_name", versionManifest.getId());
@@ -78,13 +80,17 @@ public class LaunchService {
         props.put("user_properties", "{}");
         props.put("user_type", "mojang");
 
+        File launcherFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+        if (!launcherFile.isDirectory()) {
+            Files.copy(launcherFile.toPath(), new File(configService.getDataDir() + File.separator + "libraries" + File.separator + "launcher.jar").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
         StringBuilder libs = new StringBuilder();
         Files.find(new File(configService.getDataDir() + File.separator + "libraries").toPath(), Integer.MAX_VALUE, (path, attr) -> path.toString().toLowerCase().endsWith(".jar")).forEach(p -> {
             libs.append(p.toAbsolutePath()).append(File.pathSeparator);
         });
 
         libs.append(configService.getDataDir()).append(File.separator).append("client.jar");
-        libs.append(File.pathSeparator).append(new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsolutePath());
         List<String> args = new ArrayList<>();
         args.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         args.add("-d64");
@@ -107,30 +113,20 @@ public class LaunchService {
                 args.add(s);
             }
         }
-        //StringJoiner joiner = new StringJoiner(" ");
-        //args.forEach(joiner::add);
-        //System.out.println(joiner.toString());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-
-        StringBuilder sb = new StringBuilder();
-        args.forEach(s -> sb.append('"').append(s).append('"').append(" "));
-        System.out.println(sb.toString());
-        //Runtime.getRuntime().exec(sb.toString());
+        progressor.switchToLog();
 
         ProcessBuilder processBuilder = new ProcessBuilder(args);
-        processBuilder.start();
+        processBuilder.directory(new File(configService.getDataDir()));
+        processBuilder.redirectErrorStream(true);
+        Process process = processBuilder.start();
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        InputStreamReader isr = new InputStreamReader(process.getInputStream());
+        BufferedReader br = new BufferedReader(isr);
+        String line;
+        while ((line = br.readLine()) != null) {
+            progressor.appendLog(line);
         }
-        System.exit(0);
     }
 
     private void fetch(Progressor progressor, DownloadItem item) throws IOException, ZipException {

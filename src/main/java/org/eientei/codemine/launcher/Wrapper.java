@@ -1,7 +1,6 @@
 package org.eientei.codemine.launcher;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
@@ -9,7 +8,6 @@ import java.util.Arrays;
 
 public class Wrapper {
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        PrintStream out = System.out;
         URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
             @Override
             public URLStreamHandler createURLStreamHandler(String protocol) {
@@ -17,7 +15,6 @@ public class Wrapper {
                     return new sun.net.www.protocol.https.Handler() {
                         @Override
                         protected URLConnection openConnection(URL url, Proxy proxy) throws IOException {
-                            out.println("WRAPP " + url);
                             try {
                                 if (url.getHost().equals("sessionserver.mojang.com")) {
                                     if (url.toString().contains("/hasJoined?")) {
@@ -39,7 +36,6 @@ public class Wrapper {
                     return new sun.net.www.protocol.http.Handler() {
                         @Override
                         protected URLConnection openConnection(URL url, Proxy proxy) throws IOException {
-                            out.println("WRAPPHTTP " + url);
                             return super.openConnection(url, proxy);
                         }
                     };

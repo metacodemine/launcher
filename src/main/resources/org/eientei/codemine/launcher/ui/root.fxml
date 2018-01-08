@@ -8,6 +8,7 @@
                 <fx:include source="login.fxml" fx:id="loginPane"/>
                 <fx:include source="signup.fxml" fx:id="signupPane"/>
                 <fx:include source="main.fxml" fx:id="mainPane"/>
+                <fx:include source="log.fxml" fx:id="logPane"/>
             </children>
         </StackPane>
     </children>

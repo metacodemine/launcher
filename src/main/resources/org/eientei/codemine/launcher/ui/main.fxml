@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Tab?>
@@ -23,7 +24,7 @@
     <rowConstraints>
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
-        <RowConstraints minHeight="10.0" prefHeight="60.0" vgrow="NEVER" />
+        <RowConstraints minHeight="10.0" prefHeight="90.0" vgrow="NEVER" />
     </rowConstraints>
     <children>
         <GridPane prefWidth="Infinity">
@@ -54,19 +55,40 @@
                         <GridPane alignment="CENTER">
                             <columnConstraints>
                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="20" prefWidth="100.0" />
-                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="5" prefWidth="100.0" />
+                                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="5" prefWidth="100.0" />
                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="60" prefWidth="100.0" />
                             </columnConstraints>
                             <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                                 <RowConstraints minHeight="10.0" prefHeight="120.0" valignment="CENTER" vgrow="NEVER" />
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                             </rowConstraints>
                             <children>
                                 <Label text="%memory" />
-                                <Label text="%skin" GridPane.rowIndex="1" />
-                                <TextField fx:id="memoryField" GridPane.columnIndex="2" />
-                                <HBox alignment="CENTER_LEFT" prefHeight="Infinity" prefWidth="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                <Label text="%homedir" GridPane.rowIndex="1" />
+                                <Label text="%skin" GridPane.rowIndex="2" />
+
+                                <Label fx:id="memoryChanged" GridPane.columnIndex="1" />
+                                <Label fx:id="dirChanged" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <Label fx:id="skinChanged" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                <TextField fx:id="memoryField" onKeyReleased="#markMemoryChanged" GridPane.columnIndex="2" />
+                                <GridPane prefWidth="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                    <columnConstraints>
+                                        <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" prefWidth="100.0" />
+                                        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" prefWidth="10" />
+                                        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                                    </rowConstraints>
+                                    <children>
+                                        <TextField fx:id="dirField" onKeyReleased="#markDirChanged" prefWidth="Infinity" />
+                                        <Button mnemonicParsing="false" onAction="#selectDir" text="%selectdir" GridPane.columnIndex="2" />
+                                    </children>
+                                </GridPane>
+                                <HBox alignment="CENTER_LEFT" prefHeight="Infinity" prefWidth="Infinity" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                     <Button mnemonicParsing="false" onAction="#deleteSkin" text="%deleteskin">
                                         <HBox.margin>
                                             <Insets left="5.0" right="5.0" />
@@ -83,7 +105,7 @@
                                         </HBox.margin>
                                     </ImageView>
                                 </HBox>
-                                <Button mnemonicParsing="false" onAction="#saveSettings" prefWidth="100" text="%save" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                <Button mnemonicParsing="false" onAction="#saveSettings" prefWidth="100" text="%save" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                             </children>
                         </GridPane>
                     </content>
@@ -92,7 +114,22 @@
         </TabPane>
         <StackPane GridPane.rowIndex="2">
             <children>
-                <Button fx:id="launchButton" mnemonicParsing="false" onAction="#launch" prefHeight="Infinity" prefWidth="Infinity" text="%launch" />
+                <GridPane fx:id="launchPane">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" prefWidth="100" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                        <RowConstraints minHeight="10.0" prefHeight="60.0" vgrow="ALWAYS" />
+                    </rowConstraints>
+                    <children>
+                        <CheckBox text="%showlog" fx:id="showLog">
+                            <GridPane.margin>
+                                <Insets right="10.0" />
+                            </GridPane.margin></CheckBox>
+                        <Button mnemonicParsing="false" onAction="#launch" prefHeight="Infinity" prefWidth="Infinity" text="%launch" GridPane.rowIndex="1" />
+                    </children>
+                </GridPane>
                 <VBox fx:id="progressBox" visible="false">
                     <ProgressBar fx:id="progressBar" prefWidth="Infinity" progress="0.0" />
                     <Label fx:id="progressText" />

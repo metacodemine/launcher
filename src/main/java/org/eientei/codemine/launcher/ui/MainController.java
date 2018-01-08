@@ -5,15 +5,14 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.eientei.codemine.launcher.service.ConfigService;
 import org.eientei.codemine.launcher.service.LaunchService;
@@ -37,6 +36,9 @@ public class MainController {
     private String usersUrl;
 
     @FXML
+    private TextField dirField;
+
+    @FXML
     private TextField memoryField;
 
     @FXML
@@ -49,7 +51,7 @@ public class MainController {
     private WebView newsView;
 
     @FXML
-    private Button launchButton;
+    private GridPane launchPane;
 
     @FXML
     private VBox progressBox;
@@ -60,8 +62,23 @@ public class MainController {
     @FXML
     private Label progressText;
 
+    @FXML
+    public Label memoryChanged;
+
+    @FXML
+    public Label dirChanged;
+
+    @FXML
+    public Label skinChanged;
+
+    @FXML
+    private CheckBox showLog;
+
     @Autowired
     private RootController rootController;
+
+    @Autowired
+    private LogController logController;
 
     @Autowired
     private ConfigService configService;
@@ -75,7 +92,8 @@ public class MainController {
     public void greet(String name) {
         welcome.setText("Namaste, " + name + "!");
         memoryField.setText(configService.getMemory());
-        skinPreview.setImage(new LocatedImage(usersUrl + "/texture/" + configService.getToken()));
+        dirField.setText(configService.getDataDir());
+        skinPreview.setImage(new LocatedImage(usersUrl + "/mytexture/" + configService.getToken()));
     }
 
     @FXML
@@ -92,12 +110,12 @@ public class MainController {
 
     @FXML
     public void launch() {
-        launchButton.setVisible(false);
+        launchPane.setVisible(false);
         progressBox.setVisible(true);
 
         new Thread(new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 launchService.launch(new Progressor() {
                     @Override
                     public void updateText(String text) {
@@ -114,6 +132,20 @@ public class MainController {
                         System.out.println(text);
                         System.exit(1);
                     }
+
+                    @Override
+                    public void switchToLog() {
+                        if (showLog.isSelected()) {
+                            Platform.runLater(() -> rootController.showLog());
+                        } else {
+                            Platform.exit();
+                        }
+                    }
+
+                    @Override
+                    public void appendLog(String log) {
+                        Platform.runLater(() -> logController.appendLog(log));
+                    }
                 });
                 return null;
             }
@@ -122,32 +154,71 @@ public class MainController {
 
     @FXML
     public void saveSettings() throws IOException {
-        configService.setMemory(memoryField.getText());
-        Image image = skinPreview.getImage();
-        byte[] data = new byte[] { 0x00 };
-        if (image != null) {
-            String url = ((LocatedImage) image).getUrl();
-            InputStream inputStream = new URL(url).openStream();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[4096];
-            int n;
-            while ((n = inputStream.read(buffer, 0, buffer.length)) != -1) {
-                baos.write(buffer, 0, n);
-            }
-            data = baos.toByteArray();
+        if (memoryChanged.getText().length() > 0) {
+            configService.setMemory(memoryField.getText());
+            memoryChanged.setText("");
         }
-        restTemplate.postForEntity(usersUrl + "/setskin/" + configService.getToken(), data, Void.class);
+        if (dirChanged.getText().length() > 0) {
+            configService.setDataDir(dirField.getText());
+            dirChanged.setText("");
+        }
+        if (skinChanged.getText().length() > 0) {
+            Image image = skinPreview.getImage();
+            byte[] data = new byte[] { 0x00 };
+            if (image != null) {
+                String url = ((LocatedImage) image).getUrl();
+                InputStream inputStream = new URL(url).openStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096];
+                int n;
+                while ((n = inputStream.read(buffer, 0, buffer.length)) != -1) {
+                    baos.write(buffer, 0, n);
+                }
+                data = baos.toByteArray();
+            }
+            restTemplate.postForEntity(usersUrl + "/setskin/" + configService.getToken(), data, Void.class);
+            skinChanged.setText("");
+        }
     }
 
     @FXML
     public void deleteSkin() {
         skinPreview.setImage(null);
+        skinChanged.setText("*");
     }
 
+    @FXML
     public void loadSkin(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select skin");
         File file = fileChooser.showOpenDialog(((Button) actionEvent.getTarget()).getScene().getWindow());
+        if (file == null) {
+            return;
+        }
         skinPreview.setImage(new LocatedImage("file:" + file.getAbsolutePath()));
+        skinChanged.setText("*");
+    }
+
+
+    @FXML
+    public void selectDir(ActionEvent actionEvent) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select directory");
+        File file = directoryChooser.showDialog(((Button) actionEvent.getTarget()).getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+        dirField.setText(file.getAbsolutePath());
+        dirChanged.setText("*");
+    }
+
+    @FXML
+    public void markMemoryChanged() {
+        memoryChanged.setText("*");
+    }
+
+    @FXML
+    public void markDirChanged() {
+        dirChanged.setText("*");
     }
 }
