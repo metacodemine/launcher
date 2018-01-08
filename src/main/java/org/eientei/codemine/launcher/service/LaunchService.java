@@ -114,12 +114,12 @@ public class LaunchService {
             }
         }
 
-        progressor.switchToLog();
-
         ProcessBuilder processBuilder = new ProcessBuilder(args);
         processBuilder.directory(new File(configService.getDataDir()));
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
+
+        progressor.switchToLog();
 
         InputStreamReader isr = new InputStreamReader(process.getInputStream());
         BufferedReader br = new BufferedReader(isr);

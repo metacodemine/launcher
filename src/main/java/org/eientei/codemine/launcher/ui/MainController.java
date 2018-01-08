@@ -139,6 +139,7 @@ public class MainController {
                             Platform.runLater(() -> rootController.showLog());
                         } else {
                             Platform.exit();
+                            System.exit(0);
                         }
                     }
 
